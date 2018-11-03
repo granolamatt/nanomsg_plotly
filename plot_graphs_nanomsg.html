@@ -1,0 +1,41 @@
+<html>
+
+<!-- Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script>
+    ws = new WebSocket("ws://localhost:3001",[
+                     'pub.sp.nanomsg.org'
+                  ])
+    var request_data_interval
+		
+    ws.onmessage = function (evt) 
+    { 
+        var reader = new FileReader() // handle binary messages
+        reader.addEventListener('loadend', function(){
+             var result = reader.result;
+             //console.log("Got data: " + result);
+             data = JSON.parse(result);
+             var graphDiv = document.getElementById('time-graph')
+             var my_plot = {
+                x: data.x, 
+                y: data.y, 
+                type: 'scatter',
+             };
+             Plotly.react(graphDiv, [my_plot]);
+        });
+        reader.readAsText( evt.data );
+    };
+		
+    ws.onclose = function()
+    { 
+      // websocket is closed.
+      //window.clearInterval(request_data_interval)
+    };
+    
+</script>
+<body>
+</body>
+<div id="time-graph" style="width: 400px; height: 400px;">
+
+</html>
